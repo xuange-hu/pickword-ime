@@ -1,0 +1,106 @@
+# 拾词输入法 · 拼音方案（路线 A 模板）
+# 说明：
+#   1) 本文件是模板，放在 Trime 的 Rime 方案目录（Android 上为「用户数据目录/rime」）。
+#   2) 拼写规则（speller.algebra）、模糊音等通过 __include 继承 luna_pinyin，避免手写出错。
+#      若你的 librime 版本不支持该写法，打开 submodule 里的
+#      app/data/rime/luna-pinyin/luna_pinyin.schema.yaml，把 speller / translator 段原样拷过来。
+#   3) 译词来源：pickword_en.dict.yaml 的第三列（非数字时即候选 comment）。
+#      生成方法见 tools/cedict_to_rime.py 与 rime/dicts/README.md。
+
+schema:
+  schema_id: pickword
+  name: 拾词拼音
+  version: "0.1"
+  author: xuange-hu
+  description: >
+    打字顺便学外语：候选旁显示译词，离线优先、零上传。
+  dependencies:
+    - luna_pinyin          # 提供 speller / 拼写规则 / essay 等共享资源
+    - stroke               # 反查（可选，不需要可删）
+
+switches:
+  - name: ascii_mode
+    reset: 0
+    states: [ 中文, 西文 ]
+  - name: full_shape
+    states: [ 半角, 全角 ]
+  - name: zh_simp          # 需 simplifier 支持，未启用可删
+    reset: 1
+    states: [ 漢字, 汉字 ]
+  # 译词开关（路线 A2 的 Lua filter 会读取它；路线 A 直接由词典注释决定）
+  - name: show_gloss
+    reset: 1
+    states: [ 译词关, 译词开 ]
+
+engine:
+  processors:
+    - ascii_composer
+    - recognizer
+    - key_binder
+    - speller
+    - punctuator
+    - selector
+    - navigator
+    - express_editor
+  segmentors:
+    - ascii_segmentor
+    - matcher
+    - abc_segmentor
+    - punct_segmentor
+    - fallback_segmentor
+  translators:
+    - punct_translator
+    - reverse_lookup_translator
+    - table_translator          # 主翻译器：dictionary 指向带英文注释的词典
+  filters:
+    - simplifier@zh_simp        # 与 switches 中的 zh_simp 对应
+    - uniquifier
+    # 路线 A2：词典未覆盖时，用 Lua 补注释（需 librime-lua；Trime 默认已编译该插件）
+    - lua_filter@*pickword_comment@pw_gloss
+
+# ---- 主翻译器：英文注释来自词典第三列 --------------------------------
+translator:
+  dictionary: pickword_en       # 对应 rime/dicts/pickword_en.dict.yaml 的 name
+  # prism 不写则默认与 dictionary 同名；第一次部署会自动编译，耗时数十秒
+  enable_completion: true
+  enable_sentence: true
+  enable_user_dict: true
+  encode_commit_history: true
+  max_phrase_length: 5
+  initial_quality: 1.2
+  comment_format:
+    - xform/^/〔/          # 给注释加装饰符号，便于与编码提示区分；不需要可整段删除
+    - xform/$/〕/
+
+# ---- 反查（拼音打不出时用笔画），可删 ---------------------------------
+reverse_lookup:
+  dictionary: stroke
+  enable_completion: true
+  prefix: "`"
+  suffix: "'"
+  tips: 〔笔画〕
+  comment_format:
+    - xform/^/〔/
+    - xform/$/〕/
+
+# ---- 拼写规则：继承 luna_pinyin，避免手写 algebra 出错 ----------------
+speller:
+  __include: luna_pinyin:/speller
+
+# ---- Lua 数据（路线 A2 用）--------------------------------------------
+# pw_gloss 是传给 lua_filter 的参数段，pickword_comment.lua 会读取 data_file
+pw_gloss:
+  data_file: pickword_gloss.lua   # 由 tools/cedict_to_rime.py --format lua 生成
+  max_len: 48
+
+# ---- 标点 / 按键：继承默认 --------------------------------------------
+punctuator:
+  __include: default:/punctuator
+
+key_binder:
+  __include: default:/key_binder
+
+recognizer:
+  __include: default:/recognizer
+  patterns:
+    reverse_lookup: "`[a-z]*'?$"

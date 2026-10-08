@@ -27,7 +27,7 @@
 | 层 | 选型 | 说明 |
 |---|---|---|
 | 输入法引擎底座 | **同文 Trime**（`osfans/trime`，GPL-3.0） | 已上架 Google Play/F-Droid 的 Rime Android 移植，fork 后只做增量 |
-| 译词逻辑 | Rime `librime-qjs` 处理器（JS） | 在中文候选生成后查本地词典，作为 comment 附到候选 |
+| 译词逻辑 | Rime 候选 `comment` 列 + `librime-lua` 过滤器 | 中文候选生成后查本地词典，把译词作为 comment 附到候选；Trime 已编译 Lua 插件（`RIME_PLUGINS` 含 `librime-lua`），显示层无需改动 |
 | 本地词典 | CC-CEDICT（约 11 万条，~10 MB，纯离线） | 候选旁英/日/西译词与词性来源 |
 | 生词本 / 复习 | Android Room（SQLite） + SM-2 间隔重复 | 候选"收藏"入口、复习页、学习趋势 |
 | 词表导入 | CSV（四六级 / 雅思等） | 差异化：备考人群定制词表 |
@@ -39,31 +39,42 @@
 资质线（与主线并行）：`软件著作权申请（个人·免费·1–2月，现在启动）` → `隐私政策页 + 商店账号` → 上架收口
 
 - **P0（第 1–2 周）**：建仓库、fork Trime 跑通编译、注册酷安开发者、开软著账号备材料。
-- **P1（第 3–6 周）**：CC-CEDICT 打包 + qjs 译词处理器 + 语言开关；酷安内测。
+- **P1（第 3–6 周）**：CC-CEDICT 转词典 + 译词注入（路线 A / A2）+ 语言开关；酷安内测。
 - **P2（第 7–11 周）**：生词本 + SM-2 复习 + 词表导入。
 - **P4（第 12–14 周）**：酷安正式 + 提交 OPPO/vivo（个人账号）；备选 F-Droid。
 - **P5（持续）**：运营迭代到稳定版；后置 iOS（需 Mac，fork 仓 Hamster）。
 
-## 目录约定（待开发填充）
+## 目录约定
 
 ```
 pickword-ime/
 ├── README.md                 # 本文件
-├── app/                      # Android 工程（fork Trime 后在此改造）
-├── rime/                     # Rime 方案：词典 + qjs 处理器 + 配置
-│   ├── dict/                 # CC-CEDICT 转换后的词典
-│   └── processor/            # 译词处理器（JS）
+├── app/                      # Android 工程（fork Trime 后在此改造，不入库）
+├── rime/                     # Rime 方案与译词资产
+│   ├── pickword.schema.yaml  # 方案模板（继承 luna_pinyin 拼写规则）
+│   ├── lua/
+│   │   └── pickword_comment.lua  # 译词注入 Lua filter（路线 A2）
+│   └── dicts/                # 生成产物存放处（README 里有生成与部署说明）
+├── tools/
+│   └── cedict_to_rime.py     # CC-CEDICT + 拼音词典 → 带英文注释的词典 / SQLite / Lua 表
 ├── docs/
-│   ├── 软著材料清单与模板.md
 │   ├── P0启动清单.md
+│   ├── 改造地图.md            # Trime 代码定位与三条译词实现路线
+│   ├── 编译与调试.md          # 环境、子模块、构建、常见坑
+│   ├── 软著材料清单与模板.md
 │   ├── 隐私政策模板.md
 │   └── 商店上架指南.md        # 待补充
-└── privacy-policy/           # GitHub Pages 托管的隐私政策网页源
+└── privacy-policy/           # GitHub Pages 托管的隐私政策网页源（待补充）
 ```
 
 ## 立即行动（P0）
 
 见 [`docs/P0启动清单.md`](docs/P0启动清单.md)。本周四件事：开软著账号备材料、建仓库、fork Trime 跑通编译、注册酷安开发者。
+
+开工前建议按序读这两份：
+
+1. [`docs/编译与调试.md`](docs/编译与调试.md) —— 环境、子模块、构建命令与常见坑。
+2. [`docs/改造地图.md`](docs/改造地图.md) —— 译词该注入到 Trime 的哪一层，三条路线怎么选。
 
 ## 仓库与 Git 初始化
 
