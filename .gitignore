@@ -1,0 +1,32 @@
+# Built application files
+*.apk
+*.aar
+*.ap_
+*.aab
+
+# Android / ART / Dalvik
+*.dex
+*.class
+
+# Generated / build dirs
+bin/
+gen/
+out/
+release/
+build/
+.gradle/
+.externalNativeBuild/
+
+# Local config (sdk path, signing)
+local.properties
+*.jks
+*.keystore
+
+# IDE (Android Studio / IntelliJ)
+*.iml
+.idea/
+.DS_Store
+captures/
+
+# Rime build artifacts
+app/src/main/assets/rime/build/
