@@ -63,8 +63,9 @@ pickword-ime/
 │   ├── 编译与调试.md          # 环境、子模块、构建、常见坑
 │   ├── 软著材料清单与模板.md
 │   ├── 隐私政策模板.md
-│   └── 商店上架指南.md        # 待补充
-└── privacy-policy/           # GitHub Pages 托管的隐私政策网页源（待补充）
+│   └── 商店上架指南.md        # 酷安 / OPPO / vivo 个人开发者路径与材料清单
+└── privacy-policy/
+    └── index.html            # 隐私政策网页（GitHub Pages 托管，上架用链接）
 ```
 
 ## 立即行动（P0）
