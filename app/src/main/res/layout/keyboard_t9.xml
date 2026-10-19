@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 九宫格（T9）键盘：数字键 2–9 对应拼音字母，0 上屏/分词，1 进符号面板 -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/keyboard_t9"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingStart="3dp"
+    android:paddingEnd="3dp"
+    android:paddingBottom="3dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/key_height"
+        android:orientation="horizontal"
+        android:tag="row">
+
+        <Button
+            android:id="@+id/t_abc"
+            style="@style/KeyText"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1.2"
+            android:tag="special"
+            android:text="@string/key_symbol_back"
+            android:textSize="14sp" />
+
+        <Button
+            android:id="@+id/t_1"
+            style="@style/KeyText"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="1" />
+
+        <Button
+            android:id="@+id/t_2"
+            style="@style/KeyText"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="2 ABC" />
+
+        <Button
+            android:id="@+id/t_3"
+            style="@style/KeyText"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="3 DEF" />
+
+        <Button
+            android:id="@+id/t_delete"
+            style="@style/KeyText"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1.2"
+            android:contentDescription="@string/cdesc_delete"
+            android:tag="special"
+            android:text="⌫" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/key_height"
+        android:orientation="horizontal"
+        android:tag="row">
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="0.6" />
+
+        <Button
+            android:id="@+id/t_4"
+            style="@style/KeyText"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="4 GHI" />
+
+        <Button
+            android:id="@+id/t_5"
+            style="@style/KeyText"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="5 JKL" />
+
+        <Button
+            android:id="@+id/t_6"
+            style="@style/KeyText"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="6 MNO" />
+
+        <Button
+            android:id="@+id/t_comma"
+            style="@style/KeyText"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1.2"
+            android:tag="special"
+            android:text="，" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/key_height"
+        android:orientation="horizontal"
+        android:tag="row">
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="0.6" />
+
+        <Button
+            android:id="@+id/t_7"
+            style="@style/KeyText"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="7 PQRS" />
+
+        <Button
+            android:id="@+id/t_8"
+            style="@style/KeyText"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="8 TUV" />
+
+        <Button
+            android:id="@+id/t_9"
+            style="@style/KeyText"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="9 WXYZ" />
+
+        <Button
+            android:id="@+id/t_period"
+            style="@style/KeyText"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1.2"
+            android:tag="special"
+            android:text="。" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/key_height"
+        android:orientation="horizontal"
+        android:tag="row">
+
+        <Button
+            android:id="@+id/t_symbol"
+            style="@style/KeyText"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1.2"
+            android:tag="special"
+            android:text="@string/key_symbol"
+            android:textSize="14sp" />
+
+        <Button
+            android:id="@+id/t_lang"
+            style="@style/KeyText"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1.2"
+            android:tag="special"
+            android:text="@string/key_lang"
+            android:textSize="14sp" />
+
+        <Button
+            android:id="@+id/t_0"
+            style="@style/KeyText"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="3.2"
+            android:text="@string/key_space"
+            android:textSize="13sp" />
+
+        <Button
+            android:id="@+id/t_enter"
+            style="@style/KeyText"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1.2"
+            android:contentDescription="@string/cdesc_enter"
+            android:tag="special"
+            android:text="⏎" />
+    </LinearLayout>
+</LinearLayout>

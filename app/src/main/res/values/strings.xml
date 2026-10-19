@@ -48,6 +48,37 @@
     <string name="pref_vibrate">按键振动</string>
     <string name="pref_vibrate_summary">默认关闭，可在系统设置中调节触感强度</string>
     <string name="pref_group_look">外观</string>
+    <string name="pref_group_skin">皮肤与形态</string>
+    <string name="pref_layout">键盘布局</string>
+    <string name="pref_layout_qwerty">全键盘</string>
+    <string name="pref_layout_t9">九宫格</string>
+    <string name="pref_number_row">显示数字行</string>
+    <string name="pref_sound">按键音</string>
+    <string name="pref_swipe_space">空格左右滑动移动光标</string>
+    <string name="pref_swipe_delete">退格左滑整词删除</string>
+    <string name="pref_floating">悬浮候选栏</string>
+    <string name="pref_floating_summary">候选栏悬浮在输入框上方，更像系统输入法</string>
+    <string name="pref_accent">自定义主色</string>
+    <string name="pref_skin_dark">自定义皮肤使用深色</string>
+    <string name="pref_typeface">字体</string>
+    <string name="pref_typeface_sans">无衬线</string>
+    <string name="pref_typeface_serif">衬线</string>
+    <string name="pref_typeface_mono">等宽</string>
+    <string name="pref_key_height_normal">标准</string>
+    <string name="pref_one_hand">单手模式</string>
+    <string name="pref_one_hand_off">关闭</string>
+    <string name="pref_one_hand_left">左手</string>
+    <string name="pref_one_hand_right">右手</string>
+    <string name="pref_key_text">按键字号</string>
+    <string name="pref_cand_text">候选字号</string>
+    <string name="pref_gloss_text">译词字号</string>
+    <string name="pref_radius">按键圆角</string>
+    <string name="pref_key_gap">按键间距</string>
+    <string name="pref_cand_height">候选栏高度</string>
+    <string name="pref_bg_image">键盘背景图</string>
+    <string name="pref_bg_pick">选择图片</string>
+    <string name="pref_bg_clear">清除</string>
+    <string name="pref_bg_alpha">背景不透明度</string>
     <string name="pref_theme">主题</string>
     <string name="pref_theme_system">跟随系统</string>
     <string name="pref_theme_light">浅色</string>
@@ -79,6 +110,19 @@
     <string name="review_finished">本次复习完成</string>
     <string name="review_none">当前没有到期需要复习的词</string>
     <string name="review_progress">%1$d / %2$d</string>
+
+    <!-- 面板 -->
+    <string name="panel_more_candidates">更多候选</string>
+    <string name="panel_phrases">常用语</string>
+    <string name="panel_clipboard">剪贴板</string>
+    <string name="panel_back">返回</string>
+    <string name="phrase_hint">输入常用语后点确定</string>
+    <string name="phrase_added">已添加常用语</string>
+    <string name="phrase_empty">还没有常用语，在下方输入后点确定</string>
+    <string name="clip_empty">剪贴板暂无记录</string>
+    <string name="clip_cleared">已清空剪贴板</string>
+    <string name="clip_cleared_action">清空</string>
+    <string name="emoji_recent">常用</string>
 
     <!-- 通用 -->
     <string name="ok">确定</string>

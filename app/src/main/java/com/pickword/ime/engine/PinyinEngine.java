@@ -30,6 +30,8 @@ public final class PinyinEngine {
     private static final int SCORE_EXACT = 1200;
     private static final int SCORE_PHRASE = 1000;
     private static final int SCORE_SINGLE = 950;
+    private static final int SCORE_T9_EXACT = 1180;
+    private static final int SCORE_T9_PREFIX = 780;
     private static final int SCORE_COMPOSED = 1080;
     private static final int SCORE_PREFIX = 700;
     private static final int SCORE_INITIALS = 500;
@@ -91,6 +93,37 @@ public final class PinyinEngine {
         // 5) 整句组合：多音节但没有现成词时，用每音节的高频单字拼成短语
         addComposed(db, merged, r);
 
+        List<Candidate> list = new ArrayList<>(merged.values());
+        applyUserFrequency(list);
+        Collections.sort(list);
+        if (list.size() > limit) {
+            return new ArrayList<>(list.subList(0, limit));
+        }
+        return list;
+    }
+
+    /**
+     * 九宫格（T9）查询：数字串 → 拼音 → 候选。
+     *
+     * @param digits 只含 2–9 的数字串
+     */
+    public List<Candidate> queryT9(String digits, int limit) {
+        List<Candidate> empty = new ArrayList<>();
+        if (digits == null || digits.isEmpty()) {
+            return empty;
+        }
+        SQLiteDatabase db = Dictionary.db();
+        if (db == null) {
+            return empty;
+        }
+        Map<String, Candidate> merged = new LinkedHashMap<>();
+        collect(db, merged, SELECT + "t9 = ?", new String[]{digits},
+                SCORE_T9_EXACT, digits.length(), false);
+        String upper = upperBound(digits);
+        if (upper != null) {
+            collect(db, merged, SELECT + "t9 >= ? AND t9 < ?",
+                    new String[]{digits, upper}, SCORE_T9_PREFIX, digits.length(), true);
+        }
         List<Candidate> list = new ArrayList<>(merged.values());
         applyUserFrequency(list);
         Collections.sort(list);

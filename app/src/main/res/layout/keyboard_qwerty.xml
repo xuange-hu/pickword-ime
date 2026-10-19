@@ -1,19 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- 拼音键盘：26 键 + 符号切换 + 中英切换 + 空格/换行/删除 -->
+<!-- 拼音全键盘：可选数字行 + 26 键 + 符号/表情/中英切换 + 空格/换行/删除
+     说明：tag="row" 的行由 Skinner 按设置改高度；tag="special" 的键用次要配色 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/keyboard_qwerty"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/keyboard_bg"
     android:orientation="vertical"
     android:paddingStart="3dp"
     android:paddingEnd="3dp"
     android:paddingBottom="3dp">
 
+    <!-- 数字行（可在设置中开关，默认关闭） -->
+    <LinearLayout
+        android:id="@+id/row_number"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/key_height"
+        android:orientation="horizontal"
+        android:tag="row"
+        android:visibility="gone">
+
+        <include layout="@layout/key_item" android:id="@+id/n_1" />
+        <include layout="@layout/key_item" android:id="@+id/n_2" />
+        <include layout="@layout/key_item" android:id="@+id/n_3" />
+        <include layout="@layout/key_item" android:id="@+id/n_4" />
+        <include layout="@layout/key_item" android:id="@+id/n_5" />
+        <include layout="@layout/key_item" android:id="@+id/n_6" />
+        <include layout="@layout/key_item" android:id="@+id/n_7" />
+        <include layout="@layout/key_item" android:id="@+id/n_8" />
+        <include layout="@layout/key_item" android:id="@+id/n_9" />
+        <include layout="@layout/key_item" android:id="@+id/n_0" />
+    </LinearLayout>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="@dimen/key_height"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:tag="row">
 
         <include layout="@layout/key_letter" android:id="@+id/k_q" />
         <include layout="@layout/key_letter" android:id="@+id/k_w" />
@@ -30,7 +52,8 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="@dimen/key_height"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:tag="row">
 
         <View
             android:layout_width="0dp"
@@ -54,7 +77,8 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="@dimen/key_height"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:tag="row">
 
         <Button
             android:id="@+id/k_symbol"
@@ -63,6 +87,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1.5"
             android:background="@drawable/bg_key_special"
+            android:tag="special"
             android:text="@string/key_symbol" />
 
         <include layout="@layout/key_letter" android:id="@+id/k_z" />
@@ -81,13 +106,15 @@
             android:layout_weight="1.5"
             android:background="@drawable/bg_key_special"
             android:contentDescription="@string/cdesc_delete"
+            android:tag="special"
             android:text="⌫" />
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="@dimen/key_height"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:tag="row">
 
         <Button
             android:id="@+id/k_lang"
@@ -96,6 +123,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1.3"
             android:background="@drawable/bg_key_special"
+            android:tag="special"
             android:text="@string/key_lang"
             android:textSize="14sp" />
 
@@ -106,6 +134,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:background="@drawable/bg_key_special"
+            android:tag="special"
             android:text="，" />
 
         <Button
@@ -125,6 +154,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:background="@drawable/bg_key_special"
+            android:tag="special"
             android:text="。" />
 
         <Button
@@ -135,6 +165,7 @@
             android:layout_weight="1.3"
             android:background="@drawable/bg_key_special"
             android:contentDescription="@string/cdesc_enter"
+            android:tag="special"
             android:text="⏎" />
     </LinearLayout>
 </LinearLayout>

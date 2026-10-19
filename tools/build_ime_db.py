@@ -175,6 +175,21 @@ def initials_of(pinyin: str) -> str:
     return "".join(s[0] for s in pinyin.split() if s)
 
 
+# 九宫格（T9）字母 → 数字映射
+_T9 = {}
+for _chars, _digit in (
+    ("abc", "2"), ("def", "3"), ("ghi", "4"), ("jkl", "5"), ("mno", "6"),
+    ("pqrs", "7"), ("tuv", "8"), ("wxyz", "9"),
+):
+    for _c in _chars:
+        _T9[_c] = _digit
+
+
+def t9_of(pinyin: str) -> str:
+    """拼音 → T9 数字串：wo shi → 96744"""
+    return "".join(_T9.get(c, "") for syl in pinyin.split() for c in syl)
+
+
 # ----------------------------------------------------------------------
 # 构建
 # ----------------------------------------------------------------------
@@ -238,12 +253,12 @@ def build(args) -> int:
         else:
             freq[w] = max(1, 300 - (len(w) - 1) * 60)
 
-    rows = []
+        rows = []
     for word in sorted(vocab.keys()):
         pinyin, gloss = vocab[word]
         value = max(0, min(1000, freq.get(word, 1)))
         rows.append((word, pinyin, pinyin.replace(" ", ""), initials_of(pinyin),
-                     value, gloss))
+                     t9_of(pinyin), value, gloss))
 
     out_dir = os.path.dirname(os.path.abspath(args.out))
     os.makedirs(out_dir, exist_ok=True)
@@ -257,15 +272,16 @@ def build(args) -> int:
         conn.execute("PRAGMA page_size=4096")
         conn.execute(
             "CREATE TABLE entries ("
-            "word TEXT, pinyin TEXT, raw TEXT, initials TEXT, freq INTEGER, gloss TEXT)"
+            "word TEXT, pinyin TEXT, raw TEXT, initials TEXT, t9 TEXT, "
+            "freq INTEGER, gloss TEXT)"
         )
         conn.execute("CREATE TABLE meta (key TEXT PRIMARY KEY, value TEXT)")
         conn.executemany(
-            "INSERT INTO entries (word, pinyin, raw, initials, freq, gloss) "
-            "VALUES (?,?,?,?,?,?)",
+            "INSERT INTO entries "
+            "(word, pinyin, raw, initials, t9, freq, gloss) VALUES (?,?,?,?,?,?,?)",
             rows,
         )
-        covered = sum(1 for r in rows if r[5])
+        covered = sum(1 for r in rows if r[6])
         for k, v in (
             ("source_luna", os.path.basename(args.luna)),
             ("source_cedict", os.path.basename(args.cedict)),
@@ -278,6 +294,7 @@ def build(args) -> int:
         conn.execute("CREATE INDEX idx_entries_raw ON entries(raw)")
         conn.execute("CREATE INDEX idx_entries_pinyin ON entries(pinyin)")
         conn.execute("CREATE INDEX idx_entries_initials ON entries(initials)")
+        conn.execute("CREATE INDEX idx_entries_t9 ON entries(t9)")
         conn.commit()
         conn.execute("VACUUM")
     finally:

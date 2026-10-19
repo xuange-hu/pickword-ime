@@ -21,10 +21,12 @@ import java.util.Map;
 public final class Store extends SQLiteOpenHelper {
 
     private static final String DB_NAME = "user.db";
-    private static final int DB_VERSION = 1;
+    private static final int DB_VERSION = 2;
 
     private static final String T_USERDICT = "userdict";
     private static final String T_WORDBOOK = "wordbook";
+    private static final String T_PHRASE = "phrases";
+    private static final String T_CLIP = "clips";
 
     private static volatile Store sInstance;
 
@@ -57,12 +59,102 @@ public final class Store extends SQLiteOpenHelper {
                 + "reps INTEGER NOT NULL DEFAULT 0, "
                 + "lapses INTEGER NOT NULL DEFAULT 0, "
                 + "added INTEGER NOT NULL DEFAULT 0)");
+        db.execSQL("CREATE TABLE IF NOT EXISTS " + T_PHRASE + " ("
+                + "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+                + "text TEXT UNIQUE NOT NULL, "
+                + "added INTEGER NOT NULL DEFAULT 0)");
+        db.execSQL("CREATE TABLE IF NOT EXISTS " + T_CLIP + " ("
+                + "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+                + "text TEXT UNIQUE NOT NULL, "
+                + "time INTEGER NOT NULL DEFAULT 0)");
         db.execSQL("CREATE INDEX IF NOT EXISTS idx_wordbook_due ON " + T_WORDBOOK + " (due)");
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        // v1 是首个版本，暂无迁移逻辑
+        // v2 新增常用语与剪贴板表；旧库升级时补建即可，数据不迁移
+        if (oldVersion < 2) {
+            db.execSQL("CREATE TABLE IF NOT EXISTS " + T_PHRASE + " ("
+                    + "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+                    + "text TEXT UNIQUE NOT NULL, "
+                    + "added INTEGER NOT NULL DEFAULT 0)");
+            db.execSQL("CREATE TABLE IF NOT EXISTS " + T_CLIP + " ("
+                    + "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+                    + "text TEXT UNIQUE NOT NULL, "
+                    + "time INTEGER NOT NULL DEFAULT 0)");
+        }
+    }
+
+    // ---------------- 常用语 ----------------
+
+    public List<String> listPhrases() {
+        List<String> list = new ArrayList<>();
+        Cursor c = null;
+        try {
+            c = getReadableDatabase().query(T_PHRASE, new String[]{"text"}, null, null,
+                    null, null, "id DESC");
+            while (c.moveToNext()) {
+                list.add(c.getString(0));
+            }
+        } finally {
+            if (c != null) {
+                c.close();
+            }
+        }
+        return list;
+    }
+
+    public boolean addPhrase(String text) {
+        if (text == null || text.trim().isEmpty()) {
+            return false;
+        }
+        ContentValues cv = new ContentValues();
+        cv.put("text", text.trim());
+        cv.put("added", System.currentTimeMillis());
+        return getWritableDatabase().insert(T_PHRASE, null, cv) > 0;
+    }
+
+    public boolean removePhrase(String text) {
+        return getWritableDatabase().delete(T_PHRASE, "text = ?", new String[]{text}) > 0;
+    }
+
+    // ---------------- 剪贴板历史 ----------------
+
+    public List<String> listClips(int limit) {
+        List<String> list = new ArrayList<>();
+        Cursor c = null;
+        try {
+            c = getReadableDatabase().query(T_CLIP, new String[]{"text"}, null, null,
+                    null, null, "time DESC", String.valueOf(limit));
+            while (c.moveToNext()) {
+                list.add(c.getString(0));
+            }
+        } finally {
+            if (c != null) {
+                c.close();
+            }
+        }
+        return list;
+    }
+
+    /** 记录一条剪贴板内容；已存在则刷新时间，超出上限则丢弃最旧的 */
+    public void addClip(String text, int maxKeep) {
+        if (text == null || text.trim().isEmpty()) {
+            return;
+        }
+        SQLiteDatabase db = getWritableDatabase();
+        String value = text.trim();
+        db.delete(T_CLIP, "text = ?", new String[]{value});
+        ContentValues cv = new ContentValues();
+        cv.put("text", value);
+        cv.put("time", System.currentTimeMillis());
+        db.insert(T_CLIP, null, cv);
+        db.execSQL("DELETE FROM " + T_CLIP + " WHERE id NOT IN ("
+                + "SELECT id FROM " + T_CLIP + " ORDER BY time DESC LIMIT " + maxKeep + ")");
+    }
+
+    public void clearClips() {
+        getWritableDatabase().delete(T_CLIP, null, null);
     }
 
     // ---------------- 用户词频 ----------------

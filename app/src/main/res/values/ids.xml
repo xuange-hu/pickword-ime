@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 运行时创建的视图 id（列表面板空状态提示） -->
+    <item type="id" name="panel_empty_hint" />
+</resources>

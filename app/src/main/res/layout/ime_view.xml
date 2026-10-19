@@ -1,65 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- 输入法主视图：候选条（含拼音串 + 候选 + 译词）+ 键盘容器 -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- 输入法主视图：背景层 + 内容层（候选栏 + 可切换面板） -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/ime_root"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="@color/keyboard_bg"
-    android:orientation="vertical">
+    android:layout_height="wrap_content">
+
+    <!-- 自定义背景图（用户在设置里选，可调整不透明度） -->
+    <ImageView
+        android:id="@+id/keyboard_background"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:adjustViewBounds="false"
+        android:contentDescription="@string/ime_label"
+        android:scaleType="centerCrop"
+        android:visibility="gone" />
 
     <LinearLayout
+        android:id="@+id/ime_content"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/candidate_bg"
-        android:orientation="horizontal"
-        android:paddingStart="6dp"
-        android:paddingEnd="6dp"
-        android:paddingTop="4dp"
-        android:paddingBottom="4dp">
+        android:orientation="vertical">
 
-        <!-- 拼音串（固定左侧，不随候选滚动） -->
-        <TextView
-            android:id="@+id/composition"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_gravity="center_vertical"
-            android:background="@drawable/bg_candidate"
-            android:ellipsize="end"
-            android:fontFamily="monospace"
-            android:gravity="center_vertical|start"
-            android:maxEms="8"
-            android:paddingStart="8dp"
-            android:paddingEnd="8dp"
-            android:singleLine="true"
-            android:text="@string/candidates_empty"
-            android:textColor="@color/text_secondary"
-            android:textSize="13sp" />
+        <!-- 内嵌候选栏；开启“悬浮候选”后隐藏，改由系统候选视图承载 -->
+        <include
+            android:id="@+id/candidate_bar"
+            layout="@layout/candidate_bar" />
 
-        <HorizontalScrollView
-            android:id="@+id/candidate_scroll"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="6dp"
-            android:layout_weight="1"
-            android:fillViewport="false"
-            android:scrollbars="none">
+        <View
+            android:id="@+id/ime_divider"
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:background="@color/divider" />
 
-            <LinearLayout
-                android:id="@+id/candidate_container"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal" />
-        </HorizontalScrollView>
+        <!-- 面板容器：键盘 / 表情 / 常用语 / 剪贴板 / 更多候选 -->
+        <FrameLayout
+            android:id="@+id/panel_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
     </LinearLayout>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1px"
-        android:background="@color/divider" />
-
-    <FrameLayout
-        android:id="@+id/keyboard_container"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
-</LinearLayout>
+</FrameLayout>
