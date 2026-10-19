@@ -31,10 +31,10 @@ captures/
 # Rime build artifacts
 app/src/main/assets/rime/build/
 
-# Android 工程（fork 的 Trime，体积大，不入库）
-/app/
+# 分发包（走 GitHub Releases / 酷安，不入库）
+/release/
 
-# 词典生成产物与大体积源数据（由 tools/cedict_to_rime.py 生成，随用随生成）
+# 词典生成产物与大体积源数据（由 tools/ 下脚本生成，随用随生成）
 rime/dicts/*.dict.yaml
 rime/dicts/*.db
 rime/dicts/*.tsv

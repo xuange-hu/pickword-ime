@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 单个字母键，供 <include> 复用（外层必须是水平的 LinearLayout） -->
+<Button xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/KeyText"
+    android:layout_width="0dp"
+    android:layout_height="match_parent"
+    android:layout_margin="1.5dp"
+    android:layout_weight="1"
+    android:text="a" />

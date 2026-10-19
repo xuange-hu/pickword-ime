@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">拾词输入法</string>
+    <string name="ime_label">拾词输入法</string>
+    <string name="subtype_zh">中文（拼音）</string>
+    <string name="subtype_en">English</string>
+
+    <!-- 主界面 -->
+    <string name="title_settings">设置</string>
+    <string name="title_wordbook">生词本</string>
+    <string name="title_review">复习</string>
+
+    <string name="home_status_title">启用状态</string>
+    <string name="home_status_enabled">已启用，且为当前输入法</string>
+    <string name="home_status_enabled_not_current">已启用，但不是当前输入法</string>
+    <string name="home_status_disabled">尚未启用</string>
+    <string name="home_action_enable">1. 启用输入法</string>
+    <string name="home_action_choose">2. 切换为当前输入法</string>
+    <string name="home_action_test">在下方试试打字</string>
+    <string name="home_intro">打字时，候选词旁会显示英文译词；看到想记的词，点候选上的 ☆ 收藏，之后在生词本里按间隔复习。</string>
+
+    <string name="home_entry_wordbook">生词本与复习</string>
+    <string name="home_entry_settings">设置</string>
+    <string name="home_entry_import">导入词表（CSV）</string>
+    <string name="home_entry_export">备份生词本</string>
+    <string name="home_entry_about">关于与开源</string>
+    <string name="home_test_hint">点这里开始输入…</string>
+
+    <!-- 键盘 -->
+    <string name="key_space">空格</string>
+    <string name="key_enter">换行</string>
+    <string name="key_delete">删除</string>
+    <string name="key_symbol">符号</string>
+    <string name="key_symbol_back">拼音</string>
+    <string name="key_lang">中/英</string>
+    <string name="key_hide">隐藏</string>
+    <string name="cdesc_delete">删除</string>
+    <string name="cdesc_enter">换行</string>
+    <string name="candidates_empty">—</string>
+
+    <!-- 设置 -->
+    <string name="pref_group_input">输入</string>
+    <string name="pref_gloss_enable">候选旁显示译词</string>
+    <string name="pref_gloss_enable_summary">关闭后候选只显示中文</string>
+    <string name="pref_gloss_position">译词位置</string>
+    <string name="pref_gloss_position_right">候选右侧</string>
+    <string name="pref_gloss_position_top">候选下方</string>
+    <string name="pref_vibrate">按键振动</string>
+    <string name="pref_vibrate_summary">默认关闭，可在系统设置中调节触感强度</string>
+    <string name="pref_group_look">外观</string>
+    <string name="pref_theme">主题</string>
+    <string name="pref_theme_system">跟随系统</string>
+    <string name="pref_theme_light">浅色</string>
+    <string name="pref_theme_dark">深色</string>
+    <string name="pref_key_height">键盘高度</string>
+    <string name="pref_group_data">数据与隐私</string>
+    <string name="pref_clear_freq">清除用户词频</string>
+    <string name="pref_clear_freq_summary">清空个人常用词排序，保留生词本</string>
+    <string name="pref_privacy">隐私：完全离线，不申请网络权限</string>
+    <string name="pref_about">关于拾词输入法</string>
+
+    <!-- 生词本 -->
+    <string name="wordbook_empty">还没有收藏的词。打字时点候选右侧的 ☆ 即可收藏。</string>
+    <string name="wordbook_due">待复习 %1$d</string>
+    <string name="wordbook_added">已收藏「%1$s」</string>
+    <string name="wordbook_removed">已移出「%1$s」</string>
+    <string name="wordbook_remove_cd">移出生词本</string>
+    <string name="wordbook_already">「%1$s」已在生词本中</string>
+    <string name="wordbook_action_review">开始复习</string>
+    <string name="wordbook_action_import">导入词表</string>
+    <string name="wordbook_action_export">导出备份</string>
+    <string name="wordbook_level">熟练度 %1$d%%</string>
+    <string name="wordbook_due_time">下次复习：%1$s</string>
+
+    <!-- 复习 -->
+    <string name="review_tap_show">点击查看释义</string>
+    <string name="review_got">认识</string>
+    <string name="review_missed">忘记了</string>
+    <string name="review_finished">本次复习完成</string>
+    <string name="review_none">当前没有到期需要复习的词</string>
+    <string name="review_progress">%1$d / %2$d</string>
+
+    <!-- 通用 -->
+    <string name="ok">确定</string>
+    <string name="cancel">取消</string>
+    <string name="toast_done">完成</string>
+    <string name="toast_failed">操作失败：%1$s</string>
+    <string name="importing">正在导入…</string>
+    <string name="import_done">导入 %1$d 个词</string>
+    <string name="export_done">已导出 %1$d 个词</string>
+    <string name="about_text">拾词输入法 v%1$s\n打字顺便学外语：候选旁显示译词，内置生词本与间隔复习。\n\n· 完全离线，不申请网络权限，不收集任何输入内容\n· 词库来自 CC-CEDICT 与 Rime 明月拼音（开放数据）\n· 开源许可 GPL-3.0\n\n项目主页：github.com/xuange-hu/pickword-ime</string>
+    <string name="about_title">关于</string>
+</resources>

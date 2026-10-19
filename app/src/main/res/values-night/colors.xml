@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="brand">#4FBF9E</color>
+    <color name="brand_dark">#2E8B72</color>
+    <color name="brand_soft">#1E3630</color>
+
+    <color name="window_bg">#121517</color>
+    <color name="surface">#1A1E20</color>
+    <color name="surface_variant">#23282B</color>
+
+    <color name="keyboard_bg">#0C0F10</color>
+    <color name="key_bg">#262B2E</color>
+    <color name="key_bg_special">#16191B</color>
+    <color name="key_fg">#E6EAEB</color>
+    <color name="key_fg_special">#B7C0C4</color>
+
+    <color name="candidate_bg">#1A1E20</color>
+    <color name="candidate_selected">#1E3630</color>
+    <color name="composition_bg">#16191B</color>
+
+    <color name="text_primary">#E6EAEB</color>
+    <color name="text_secondary">#A3AEB2</color>
+    <color name="text_tertiary">#737D82</color>
+    <color name="gloss">#6FD3B4</color>
+    <color name="divider">#2A3033</color>
+    <color name="star">#E6B94F</color>
+</resources>

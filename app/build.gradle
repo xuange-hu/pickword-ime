@@ -1,0 +1,61 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'com.pickword.ime'
+    compileSdk 36
+
+    defaultConfig {
+        applicationId 'com.pickword.ime'
+        minSdk 21
+        targetSdk 36
+        versionCode 1
+        versionName '0.1.0'
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            // 便于直接分发：release 也用 debug 签名（正式上架前请换成自己的签名）
+            signingConfig signingConfigs.debug
+        }
+        debug {
+            minifyEnabled false
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    buildFeatures {
+        // About 对话框用它显示版本号
+        buildConfig = true
+    }
+
+    // 词典是资源，压缩收益低，直接不压缩以加快首次拷贝
+    androidResources {
+        noCompress += 'db'
+    }
+
+    lint {
+        abortOnError false
+        checkReleaseBuilds false
+    }
+}
+
+// AppCompat 会顺带引入旧版 kotlin-stdlib-jdk7/8，与 kotlin-stdlib 1.8.22 撞类。
+// 本项目是纯 Java，不需要 Kotlin 运行时，直接把两个旧模块排除掉。
+configurations.configureEach {
+    exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk7'
+    exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk8'
+}
+
+dependencies {
+    implementation 'androidx.appcompat:appcompat:1.7.0'
+    implementation 'androidx.core:core:1.13.1'
+}

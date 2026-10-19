@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- DayNight 基类：自动跟随系统深色模式，满足 Android 5.0+ 的兼容性要求 -->
+    <style name="Theme.PickWord" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/brand</item>
+        <item name="colorPrimaryDark">@color/brand_dark</item>
+        <item name="colorAccent">@color/brand</item>
+        <item name="android:windowBackground">@color/window_bg</item>
+        <item name="android:textColorPrimary">@color/text_primary</item>
+        <item name="android:textColorSecondary">@color/text_secondary</item>
+    </style>
+
+    <style name="TextAppearance.Candidate" parent="TextAppearance.AppCompat.Medium">
+        <item name="android:textSize">19sp</item>
+        <item name="android:textColor">@color/text_primary</item>
+    </style>
+
+    <style name="TextAppearance.Gloss" parent="TextAppearance.AppCompat.Small">
+        <item name="android:textSize">11sp</item>
+        <item name="android:textColor">@color/gloss</item>
+    </style>
+
+    <style name="TextAppearance.Key" parent="TextAppearance.AppCompat.Button">
+        <item name="android:textSize">20sp</item>
+        <item name="android:textColor">@color/key_fg</item>
+    </style>
+</resources>

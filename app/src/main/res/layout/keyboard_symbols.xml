@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 符号/数字键盘：与拼音键盘共用同一套按键样式，切换即可 -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/keyboard_symbols"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/keyboard_bg"
+    android:orientation="vertical"
+    android:paddingStart="3dp"
+    android:paddingEnd="3dp"
+    android:paddingBottom="3dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/key_height"
+        android:orientation="horizontal">
+        <include layout="@layout/key_item" android:id="@+id/s_1" />
+        <include layout="@layout/key_item" android:id="@+id/s_2" />
+        <include layout="@layout/key_item" android:id="@+id/s_3" />
+        <include layout="@layout/key_item" android:id="@+id/s_4" />
+        <include layout="@layout/key_item" android:id="@+id/s_5" />
+        <include layout="@layout/key_item" android:id="@+id/s_6" />
+        <include layout="@layout/key_item" android:id="@+id/s_7" />
+        <include layout="@layout/key_item" android:id="@+id/s_8" />
+        <include layout="@layout/key_item" android:id="@+id/s_9" />
+        <include layout="@layout/key_item" android:id="@+id/s_0" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/key_height"
+        android:orientation="horizontal">
+        <include layout="@layout/key_item" android:id="@+id/s_at" />
+        <include layout="@layout/key_item" android:id="@+id/s_hash" />
+        <include layout="@layout/key_item" android:id="@+id/s_usd" />
+        <include layout="@layout/key_item" android:id="@+id/s_pct" />
+        <include layout="@layout/key_item" android:id="@+id/s_and" />
+        <include layout="@layout/key_item" android:id="@+id/s_star" />
+        <include layout="@layout/key_item" android:id="@+id/s_minus" />
+        <include layout="@layout/key_item" android:id="@+id/s_plus" />
+        <include layout="@layout/key_item" android:id="@+id/s_eq" />
+        <include layout="@layout/key_item" android:id="@+id/s_slash" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/key_height"
+        android:orientation="horizontal">
+        <include layout="@layout/key_item" android:id="@+id/s_lp" />
+        <include layout="@layout/key_item" android:id="@+id/s_rp" />
+        <include layout="@layout/key_item" android:id="@+id/s_lb" />
+        <include layout="@layout/key_item" android:id="@+id/s_rb" />
+        <include layout="@layout/key_item" android:id="@+id/s_lc" />
+        <include layout="@layout/key_item" android:id="@+id/s_rc" />
+        <include layout="@layout/key_item" android:id="@+id/s_em" />
+        <include layout="@layout/key_item" android:id="@+id/s_en" />
+        <include layout="@layout/key_item" android:id="@+id/s_que" />
+        <include layout="@layout/key_item" android:id="@+id/s_exc" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/key_height"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/s_back"
+            style="@style/KeyText"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_margin="1.5dp"
+            android:layout_weight="1.5"
+            android:background="@drawable/bg_key_special"
+            android:text="@string/key_symbol_back"
+            android:textSize="13sp" />
+
+        <Button
+            android:id="@+id/s_comma"
+            style="@style/KeyText"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_margin="1.5dp"
+            android:layout_weight="1"
+            android:background="@drawable/bg_key_special"
+            android:text="，" />
+
+        <Button
+            android:id="@+id/s_space"
+            style="@style/KeyText"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_margin="1.5dp"
+            android:layout_weight="3"
+            android:background="@drawable/bg_key"
+            android:text="@string/key_space"
+            android:textSize="13sp" />
+
+        <Button
+            android:id="@+id/s_period"
+            style="@style/KeyText"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_margin="1.5dp"
+            android:layout_weight="1"
+            android:background="@drawable/bg_key_special"
+            android:text="。" />
+
+        <Button
+            android:id="@+id/s_delete"
+            style="@style/KeyText"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_margin="1.5dp"
+            android:layout_weight="1.5"
+            android:background="@drawable/bg_key_special"
+            android:contentDescription="@string/cdesc_delete"
+            android:text="⌫" />
+    </LinearLayout>
+</LinearLayout>

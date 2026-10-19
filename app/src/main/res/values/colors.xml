@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 品牌色：拾词的“书签绿” -->
+    <color name="brand">#0E7C66</color>
+    <color name="brand_dark">#0A5A4A</color>
+    <color name="brand_soft">#DCEFE9</color>
+
+    <color name="window_bg">#F4F6F7</color>
+    <color name="surface">#FFFFFF</color>
+    <color name="surface_variant">#EAEFF1</color>
+
+    <color name="keyboard_bg">#DDE3E6</color>
+    <color name="key_bg">#FFFFFF</color>
+    <color name="key_bg_special">#C7D0D4</color>
+    <color name="key_fg">#1B1F21</color>
+    <color name="key_fg_special">#1B1F21</color>
+
+    <color name="candidate_bg">#F7F9FA</color>
+    <color name="candidate_selected">#DCEFE9</color>
+    <color name="composition_bg">#F7F9FA</color>
+
+    <color name="text_primary">#172021</color>
+    <color name="text_secondary">#5F6B70</color>
+    <color name="text_tertiary">#8A9599</color>
+    <color name="gloss">#0E7C66</color>
+    <color name="divider">#D5DBDE</color>
+    <color name="star">#E0A32E</color>
+</resources>
