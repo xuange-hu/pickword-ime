@@ -11,11 +11,15 @@
     </style>
 
     <style name="TextAppearance.Candidate" parent="TextAppearance.AppCompat.Medium">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
         <item name="android:textSize">19sp</item>
         <item name="android:textColor">@color/text_primary</item>
     </style>
 
     <style name="TextAppearance.Gloss" parent="TextAppearance.AppCompat.Small">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
         <item name="android:textSize">11sp</item>
         <item name="android:textColor">@color/gloss</item>
     </style>

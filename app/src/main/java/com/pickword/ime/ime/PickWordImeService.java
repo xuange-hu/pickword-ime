@@ -187,26 +187,31 @@ public class PickWordImeService extends InputMethodService {
     @Override
     public View onCreateInputView() {
         View view = getLayoutInflater().inflate(R.layout.ime_view, null);
-        mImeRoot = view.findViewById(R.id.ime_root);
-        mImeContent = view.findViewById(R.id.ime_content);
-        mPanelContainer = view.findViewById(R.id.panel_container);
-        mBackgroundImage = view.findViewById(R.id.keyboard_background);
-        mDivider = view.findViewById(R.id.ime_divider);
-        mEmbeddedBar = view.findViewById(R.id.candidate_bar);
-        setupCandidateBar(mEmbeddedBar);
-        showKeyboardPanel();
-        refreshCandidates();
-        setCandidatesViewShown(mPrefs.isFloatingCandidates());
+        try {
+            mImeRoot = view.findViewById(R.id.ime_root);
+            mImeContent = view.findViewById(R.id.ime_content);
+            mPanelContainer = view.findViewById(R.id.panel_container);
+            mBackgroundImage = view.findViewById(R.id.keyboard_background);
+            mDivider = view.findViewById(R.id.ime_divider);
+            mEmbeddedBar = view.findViewById(R.id.candidate_bar);
+            setupCandidateBar(mEmbeddedBar);
+            showKeyboardPanel();
+            applyFloatingCandidates();
+            refreshCandidates();
+        } catch (Throwable ignored) {
+            // 任何初始化意外都不应让键盘视图创建失败
+        }
         return view;
     }
 
+    /**
+     * 候选栏始终由键盘视图内嵌承载（非悬浮）；悬浮模式在 {@link #applyFloatingCandidates()}
+     * 中按需 {@code setCandidatesView}。这里返回 null，避免框架在 {@link #onCreateInputView()}
+     * 之前抢先创建候选视图而导致 mEmbeddedBar 尚未赋值时空指针崩溃。
+     */
     @Override
     public View onCreateCandidatesView() {
-        View bar = getLayoutInflater().inflate(R.layout.candidate_bar, null);
-        mFloatingBar = bar;
-        setupCandidateBar(bar);
-        applyFloatingCandidates();
-        return bar;
+        return null;
     }
 
     @Override
@@ -222,13 +227,17 @@ public class PickWordImeService extends InputMethodService {
         if (mPrefs == null || mPanelContainer == null) {
             return;
         }
-        // 设置可能在应用里改过，每次弹出都重放一遍
-        mEnglishMode = detectEnglish(attribute);
-        applyBackground();
-        applyOneHand();
-        applyFloatingCandidates();
-        showKeyboardPanel();
-        clearComposing(false);
+        try {
+            // 设置可能在应用里改过，每次弹出都重放一遍
+            mEnglishMode = detectEnglish(attribute);
+            applyBackground();
+            applyOneHand();
+            applyFloatingCandidates();
+            showKeyboardPanel();
+            clearComposing(false);
+        } catch (Throwable ignored) {
+            // 弹出时的意外不应让输入法崩溃
+        }
     }
 
     @Override
@@ -274,45 +283,52 @@ public class PickWordImeService extends InputMethodService {
         if (mPanelContainer == null) {
             return;
         }
-        mPanel = panel;
-        View view;
-        switch (panel) {
-            case P_T9:
-                view = getLayoutInflater().inflate(R.layout.keyboard_t9, mPanelContainer, false);
-                break;
-            case P_SYMBOL:
-                view = getLayoutInflater().inflate(R.layout.keyboard_symbols, mPanelContainer, false);
-                break;
-            case P_EMOJI:
-                view = buildEmojiPanel();
-                break;
-            case P_MORE:
-                view = buildMorePanel();
-                break;
-            case P_PHRASE:
-                view = buildPhrasePanel();
-                break;
-            case P_CLIP:
-                view = buildClipPanel();
-                break;
-            case P_QWERTY:
-            default:
-                view = getLayoutInflater().inflate(R.layout.keyboard_qwerty, mPanelContainer, false);
-                break;
+        try {
+            mPanel = panel;
+            View view;
+            switch (panel) {
+                case P_T9:
+                    view = getLayoutInflater().inflate(R.layout.keyboard_t9, mPanelContainer, false);
+                    break;
+                case P_SYMBOL:
+                    view = getLayoutInflater().inflate(R.layout.keyboard_symbols, mPanelContainer, false);
+                    break;
+                case P_EMOJI:
+                    view = buildEmojiPanel();
+                    break;
+                case P_MORE:
+                    view = buildMorePanel();
+                    break;
+                case P_PHRASE:
+                    view = buildPhrasePanel();
+                    break;
+                case P_CLIP:
+                    view = buildClipPanel();
+                    break;
+                case P_QWERTY:
+                default:
+                    view = getLayoutInflater().inflate(R.layout.keyboard_qwerty, mPanelContainer, false);
+                    break;
+            }
+            if (view == null) {
+                return;
+            }
+            mPanelContainer.removeAllViews();
+            mPanelContainer.addView(view);
+            Skinner.applyPanel(view, mPrefs);
+            if (panel == P_QWERTY) {
+                bindLabels(view, QWERTY_IDS, QWERTY_LETTERS);
+                bindLabels(view, NUMBER_IDS, NUMBER_LABELS);
+            } else if (panel == P_SYMBOL) {
+                bindLabels(view, SYMBOL_IDS, SYMBOL_LABELS);
+            }
+            wireKeys(view);
+            applyNumberRow(view);
+            applyOneHand();
+            refreshCandidates();
+        } catch (Throwable ignored) {
+            // 面板构建失败不应让输入法整体崩溃
         }
-        mPanelContainer.removeAllViews();
-        mPanelContainer.addView(view);
-        Skinner.applyPanel(view, mPrefs);
-        if (panel == P_QWERTY) {
-            bindLabels(view, QWERTY_IDS, QWERTY_LETTERS);
-            bindLabels(view, NUMBER_IDS, NUMBER_LABELS);
-        } else if (panel == P_SYMBOL) {
-            bindLabels(view, SYMBOL_IDS, SYMBOL_LABELS);
-        }
-        wireKeys(view);
-        applyNumberRow(view);
-        applyOneHand();
-        refreshCandidates();
     }
 
     /** 数字行可见性（仅全键盘有这一行） */
@@ -539,10 +555,18 @@ public class PickWordImeService extends InputMethodService {
     private void bindTextList(ListView list, List<String> items, final int emptyRes,
                               final boolean removable) {
         final Skin skin = mPrefs.getSkin();
+        ViewGroup parent = list.getParent() instanceof ViewGroup
+                ? (ViewGroup) list.getParent() : null;
+        // 先清掉上一次的空提示，避免与列表共存
+        if (parent != null) {
+            View old = parent.findViewById(R.id.panel_empty_hint);
+            if (old != null) {
+                parent.removeView(old);
+            }
+        }
         if (items.isEmpty()) {
             list.setAdapter(null);
-            ViewGroup parent = (ViewGroup) list.getParent();
-            if (parent != null && parent.findViewById(R.id.panel_empty_hint) == null) {
+            if (parent != null) {
                 TextView hint = new TextView(this);
                 hint.setId(R.id.panel_empty_hint);
                 hint.setText(emptyRes);
@@ -686,7 +710,11 @@ public class PickWordImeService extends InputMethodService {
     private final View.OnClickListener mKeyListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            onKey(v);
+            try {
+                onKey(v);
+            } catch (Throwable ignored) {
+                // 单个按键异常不让整个输入法崩溃
+            }
         }
     };
 
@@ -1046,66 +1074,83 @@ public class PickWordImeService extends InputMethodService {
         if (mCandidateContainer == null) {
             return;
         }
-        List<Candidate> list = new ArrayList<>();
-        String query = currentQuery();
-        if (query.length() > 0) {
-            if (isT9Layout()) {
-                list = mEngine.queryT9(query, MAX_CANDIDATES);
-            } else {
-                list = mEngine.query(query, MAX_CANDIDATES);
+        try {
+            List<Candidate> list = new ArrayList<>();
+            String query = currentQuery();
+            if (query.length() > 0) {
+                if (isT9Layout()) {
+                    list = mEngine.queryT9(query, MAX_CANDIDATES);
+                } else {
+                    list = mEngine.query(query, MAX_CANDIDATES);
+                }
             }
+            mCandidates = list;
+            renderCandidates(list);
+        } catch (Throwable ignored) {
+            // 词典/查询异常降级为空候选，不影响键盘本身
         }
-        mCandidates = list;
-        renderCandidates(list);
     }
 
     private void renderCandidates(List<Candidate> list) {
-        mCandidateContainer.removeAllViews();
-        mCandidateViews.clear();
-        boolean glossEnabled = mPrefs.isGlossEnabled();
-        int layout = mPrefs.isGlossOnRight()
-                ? R.layout.item_candidate_right : R.layout.item_candidate;
-        LayoutInflater inflater = getLayoutInflater();
-        for (Candidate c : list) {
-            View item = inflater.inflate(layout, mCandidateContainer, false);
-            Skinner.applyCandidateItem(item, mPrefs);
-            TextView word = item.findViewById(R.id.candidate_word);
-            TextView gloss = item.findViewById(R.id.candidate_gloss);
-            TextView star = item.findViewById(R.id.candidate_star);
-            word.setText(c.word);
-            if (glossEnabled && c.gloss != null && !c.gloss.isEmpty()) {
-                gloss.setText(c.gloss);
-                gloss.setVisibility(View.VISIBLE);
-            } else {
-                gloss.setVisibility(View.GONE);
-            }
-            item.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Candidate target = (Candidate) v.getTag();
-                    if (target != null) {
-                        feedback();
-                        commitCandidate(target);
-                    }
-                }
-            });
-            item.setTag(c);
-            star.setTag(c);
-            star.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Candidate target = (Candidate) v.getTag();
-                    if (target == null) {
-                        return;
-                    }
-                    collect(target);
-                }
-            });
-            mCandidateContainer.addView(item);
-            mCandidateViews.add(item);
+        if (mCandidateContainer == null) {
+            return;
         }
-        if (mCandidateScroll != null) {
-            mCandidateScroll.scrollTo(0, 0);
+        try {
+            mCandidateContainer.removeAllViews();
+            mCandidateViews.clear();
+            boolean glossEnabled = mPrefs.isGlossEnabled();
+            int layout = mPrefs.isGlossOnRight()
+                    ? R.layout.item_candidate_right : R.layout.item_candidate;
+            LayoutInflater inflater = getLayoutInflater();
+            for (Candidate c : list) {
+                View item = inflater.inflate(layout, mCandidateContainer, false);
+                Skinner.applyCandidateItem(item, mPrefs);
+                TextView word = item.findViewById(R.id.candidate_word);
+                TextView gloss = item.findViewById(R.id.candidate_gloss);
+                TextView star = item.findViewById(R.id.candidate_star);
+                if (word != null) {
+                    word.setText(c.word);
+                }
+                if (gloss != null) {
+                    if (glossEnabled && c.gloss != null && !c.gloss.isEmpty()) {
+                        gloss.setText(c.gloss);
+                        gloss.setVisibility(View.VISIBLE);
+                    } else {
+                        gloss.setVisibility(View.GONE);
+                    }
+                }
+                item.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Candidate target = (Candidate) v.getTag();
+                        if (target != null) {
+                            feedback();
+                            commitCandidate(target);
+                        }
+                    }
+                });
+                item.setTag(c);
+                if (star != null) {
+                    star.setTag(c);
+                    star.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Candidate target = (Candidate) v.getTag();
+                            if (target == null) {
+                                return;
+                            }
+                            collect(target);
+                        }
+                    });
+                }
+                mCandidateContainer.addView(item);
+                mCandidateViews.add(item);
+            }
+            if (mCandidateScroll != null) {
+                mCandidateScroll.scrollTo(0, 0);
+            }
+        } catch (Throwable ignored) {
+            // 任何渲染意外都不应让键盘崩掉
         }
     }
 
@@ -1170,6 +1215,9 @@ public class PickWordImeService extends InputMethodService {
     }
 
     private void bindCandidateViews(View bar) {
+        if (bar == null) {
+            return;
+        }
         mComposition = bar.findViewById(R.id.composition);
         mCandidateScroll = bar.findViewById(R.id.candidate_scroll);
         mCandidateContainer = bar.findViewById(R.id.candidate_container);
@@ -1194,6 +1242,9 @@ public class PickWordImeService extends InputMethodService {
     }
 
     private void applyFloatingCandidates() {
+        if (mPrefs == null) {
+            return;
+        }
         boolean floating = mPrefs.isFloatingCandidates();
         if (mEmbeddedBar != null) {
             mEmbeddedBar.setVisibility(floating ? View.GONE : View.VISIBLE);
@@ -1205,13 +1256,15 @@ public class PickWordImeService extends InputMethodService {
             if (mFloatingBar == null) {
                 mFloatingBar = getLayoutInflater().inflate(R.layout.candidate_bar, null);
                 setupCandidateBar(mFloatingBar);
-                setCandidatesView(mFloatingBar);
             }
+            setCandidatesView(mFloatingBar);
             setCandidatesViewShown(true);
             bindCandidateViews(mFloatingBar);
         } else {
             setCandidatesViewShown(false);
-            bindCandidateViews(mEmbeddedBar);
+            if (mEmbeddedBar != null) {
+                bindCandidateViews(mEmbeddedBar);
+            }
         }
         refreshCandidates();
     }
