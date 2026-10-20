@@ -36,6 +36,9 @@ public final class PinyinEngine {
     private static final int SCORE_PREFIX = 700;
     private static final int SCORE_INITIALS = 500;
 
+    /** 含生僻汉字（CJK 区但不在 GB2312）的候选降权，避免怪字挤占前排 */
+    private static final int RARE_PENALTY = 600;
+
     private static final String SELECT =
             "SELECT word, gloss, freq, raw FROM entries WHERE ";
 
@@ -163,7 +166,35 @@ public final class PinyinEngine {
             return;
         }
         int score = SCORE_COMPOSED + freqSum / (syllables.size() * 20);
+        if (containsRareHanzi(text)) {
+            score -= RARE_PENALTY;
+        }
         merged.put(text, new Candidate(text, "", score));
+    }
+
+    /**
+     * 是否含「生僻汉字」：落在 CJK 统一表意文字区（U+4E00–U+9FFF）但无法用 GB2312
+     * 编码的字符。GB2312 覆盖 6763 个汉字（含一级 3755 最常用），可粗略代表「常用字」；
+     * 扩展 A/B 等区的生僻字不在其中，应在候选里降权，避免「嚺 / 毜 / 兿」挤占前排。
+     */
+    private static boolean containsRareHanzi(String s) {
+        if (s == null) {
+            return false;
+        }
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (c < 0x4E00 || c > 0x9FFF) {
+                continue;
+            }
+            try {
+                if (String.valueOf(c).getBytes("GB2312").length != 2) {
+                    return true;
+                }
+            } catch (Exception ignored) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private SingleChar topChar(SQLiteDatabase db, String syllable) {
@@ -210,6 +241,9 @@ public final class PinyinEngine {
                 int score = base + boost(freq);
                 if (lengthPenalty) {
                     score -= (pinyinLen - rawLen) * 12;
+                }
+                if (containsRareHanzi(word)) {
+                    score -= RARE_PENALTY;
                 }
                 Candidate existing = merged.get(word);
                 if (existing == null || score > existing.score) {
