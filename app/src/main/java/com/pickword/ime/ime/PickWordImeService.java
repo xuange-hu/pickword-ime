@@ -143,6 +143,9 @@ public class PickWordImeService extends InputMethodService {
     private int mPanel = P_QWERTY;
     private float mSwipeSlop;
 
+    /** 上下文联想：上一词已上屏的中文词（用于本地 bigram 预测，仿搜狗/百度） */
+    private String mLastWord = null;
+
     private final Handler mMainHandler = new Handler(Looper.getMainLooper());
     private final ExecutorService mWorker = Executors.newSingleThreadExecutor();
     private final List<View> mCandidateViews = new ArrayList<>();
@@ -417,6 +420,8 @@ public class PickWordImeService extends InputMethodService {
         String query = currentQuery();
         List<Candidate> cands = new ArrayList<>();
         if (query.length() > 0) {
+            mEngine.setContext(mPrefs.isContextPredictEnabled() ? mLastWord : null);
+            mEngine.setFuzzy(mPrefs.isFuzzyEnabled());
             if (isT9Layout()) {
                 cands = mEngine.queryT9(query, MORE_LIMIT);
             } else {
@@ -983,9 +988,22 @@ public class PickWordImeService extends InputMethodService {
         ic.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, key));
     }
 
+    /** 是否含中日韩表意汉字（用于判断上下文联想的「词」） */
+    private static boolean containsCJK(String s) {
+        if (s == null) {
+            return false;
+        }
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (c >= 0x4E00 && c <= 0x9FFF) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /** 英文模式句首自动大写 */
-    private boolean shouldCapitalize() {
-        InputConnection ic = getCurrentInputConnection();
+    private boolean shouldCapitalize() {        InputConnection ic = getCurrentInputConnection();
         if (ic == null) {
             return false;
         }
@@ -1005,12 +1023,27 @@ public class PickWordImeService extends InputMethodService {
             ic.commitText(candidate.word, 1);
         }
         recordClip(candidate.word);
+        final String word = candidate.word;
+        // 先在主线程捕获「上一词」：若在后台任务里再读 mLastWord，
+        // 主线程可能已把它更新为当前词，导致 prev==word 被跳过、共现永远记不上
+        final String prevWord = mLastWord;
         mWorker.execute(new Runnable() {
             @Override
             public void run() {
-                mStore.bumpFrequency(candidate.word);
+                mStore.bumpFrequency(word);
+                // 上下文联想：记录「上一词 -> 本词」共现（仅记中文词）
+                if (containsCJK(word)) {
+                    mStore.bumpCooc(prevWord, word);
+                }
             }
         });
+        // 更新上下文：中文词作为下一词的「上一词」
+        if (containsCJK(word)) {
+            mLastWord = word;
+        } else {
+            // 标点/英文等打断上下文，下一词不从它联想
+            mLastWord = null;
+        }
         clearComposing(true);
     }
 
@@ -1078,6 +1111,8 @@ public class PickWordImeService extends InputMethodService {
             List<Candidate> list = new ArrayList<>();
             String query = currentQuery();
             if (query.length() > 0) {
+                mEngine.setContext(mPrefs.isContextPredictEnabled() ? mLastWord : null);
+                mEngine.setFuzzy(mPrefs.isFuzzyEnabled());
                 if (isT9Layout()) {
                     list = mEngine.queryT9(query, MAX_CANDIDATES);
                 } else {

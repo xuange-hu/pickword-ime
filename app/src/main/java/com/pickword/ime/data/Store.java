@@ -21,12 +21,13 @@ import java.util.Map;
 public final class Store extends SQLiteOpenHelper {
 
     private static final String DB_NAME = "user.db";
-    private static final int DB_VERSION = 2;
+    private static final int DB_VERSION = 3;
 
     private static final String T_USERDICT = "userdict";
     private static final String T_WORDBOOK = "wordbook";
     private static final String T_PHRASE = "phrases";
     private static final String T_CLIP = "clips";
+    private static final String T_COOC = "cooc";
 
     private static volatile Store sInstance;
 
@@ -67,12 +68,17 @@ public final class Store extends SQLiteOpenHelper {
                 + "id INTEGER PRIMARY KEY AUTOINCREMENT, "
                 + "text TEXT UNIQUE NOT NULL, "
                 + "time INTEGER NOT NULL DEFAULT 0)");
+        db.execSQL("CREATE TABLE IF NOT EXISTS " + T_COOC + " ("
+                + "prev TEXT NOT NULL, "
+                + "word TEXT NOT NULL, "
+                + "n INTEGER NOT NULL DEFAULT 0, "
+                + "PRIMARY KEY(prev, word))");
         db.execSQL("CREATE INDEX IF NOT EXISTS idx_wordbook_due ON " + T_WORDBOOK + " (due)");
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        // v2 新增常用语与剪贴板表；旧库升级时补建即可，数据不迁移
+        // v2 新增常用语与剪贴板表；v3 新增上下文共现表。旧库升级时补建，数据不迁移。
         if (oldVersion < 2) {
             db.execSQL("CREATE TABLE IF NOT EXISTS " + T_PHRASE + " ("
                     + "id INTEGER PRIMARY KEY AUTOINCREMENT, "
@@ -82,6 +88,13 @@ public final class Store extends SQLiteOpenHelper {
                     + "id INTEGER PRIMARY KEY AUTOINCREMENT, "
                     + "text TEXT UNIQUE NOT NULL, "
                     + "time INTEGER NOT NULL DEFAULT 0)");
+        }
+        if (oldVersion < 3) {
+            db.execSQL("CREATE TABLE IF NOT EXISTS " + T_COOC + " ("
+                    + "prev TEXT NOT NULL, "
+                    + "word TEXT NOT NULL, "
+                    + "n INTEGER NOT NULL DEFAULT 0, "
+                    + "PRIMARY KEY(prev, word))");
         }
     }
 
@@ -175,6 +188,64 @@ public final class Store extends SQLiteOpenHelper {
     public void clearFrequency() {
         SQLiteDatabase db = getWritableDatabase();
         db.delete(T_USERDICT, null, null);
+    }
+
+    // ---------------- 上下文共现（联想/上下文预测） ----------------
+
+    /**
+     * 记录「上一词 → 本词」的共现次数 +1，用于上下文联想（仿搜狗/百度上下文预测）。
+     * prev 或 word 为空、或二者相同则忽略。
+     */
+    public void bumpCooc(String prev, String word) {
+        if (prev == null || word == null || prev.isEmpty() || word.isEmpty()) {
+            return;
+        }
+        if (prev.equals(word)) {
+            return;
+        }
+        SQLiteDatabase db = getWritableDatabase();
+        db.execSQL("INSERT OR IGNORE INTO " + T_COOC + " (prev, word, n) VALUES (?, ?, 0)",
+                new Object[]{prev, word});
+        db.execSQL("UPDATE " + T_COOC + " SET n = n + 1 WHERE prev = ? AND word = ?",
+                new Object[]{prev, word});
+    }
+
+    public void clearCooc() {
+        SQLiteDatabase db = getWritableDatabase();
+        db.delete(T_COOC, null, null);
+    }
+
+    /** 取 words 中，在 prev 之后出现过的共现次数（用于上下文加权） */
+    public Map<String, Integer> getCooc(String prev, Collection<String> words) {
+        Map<String, Integer> map = new HashMap<>();
+        if (prev == null || prev.isEmpty() || words == null || words.isEmpty()) {
+            return map;
+        }
+        StringBuilder sb = new StringBuilder();
+        String[] args = new String[words.size() + 1];
+        int i = 0;
+        for (String w : words) {
+            if (i > 0) {
+                sb.append(',');
+            }
+            sb.append('?');
+            args[i++] = w;
+        }
+        args[i] = prev;
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor c = null;
+        try {
+            c = db.rawQuery("SELECT word, n FROM " + T_COOC
+                    + " WHERE prev = ? AND word IN (" + sb + ")", args);
+            while (c.moveToNext()) {
+                map.put(c.getString(0), c.getInt(1));
+            }
+        } finally {
+            if (c != null) {
+                c.close();
+            }
+        }
+        return map;
     }
 
     /** 批量取词频，用于候选项排序加权 */

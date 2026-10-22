@@ -72,6 +72,11 @@ public final class SyllableSplitter {
     private static final int MAX_SPLITS = 8;
     private static final int MAX_SYLLABLE_LEN = 6;
 
+    /** 是否为合法普通话音节（供模糊音过滤无效组合使用） */
+    public static boolean isSyllable(String s) {
+        return s != null && SET.contains(s);
+    }
+
     private SyllableSplitter() {
     }
 

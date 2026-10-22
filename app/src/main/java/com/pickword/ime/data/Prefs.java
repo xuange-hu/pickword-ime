@@ -44,6 +44,10 @@ public final class Prefs {
     private static final String K_GLOSS_POS = "gloss_position";
     private static final String K_FLOATING = "floating_candidates";
 
+    // 智能
+    private static final String K_FUZZY = "fuzzy_pinyin";
+    private static final String K_CONTEXT = "context_predict";
+
     public static final int THEME_SYSTEM = 0;
     public static final int THEME_LIGHT = 1;
     public static final int THEME_DARK = 2;
@@ -317,5 +321,23 @@ public final class Prefs {
 
     public void setFloatingCandidates(boolean floating) {
         mSp.edit().putBoolean(K_FLOATING, floating).apply();
+    }
+
+    /** 模糊音：z/zh、an/ang 等易混音节互相映射（仿搜狗/百度智能纠错） */
+    public boolean isFuzzyEnabled() {
+        return mSp.getBoolean(K_FUZZY, true);
+    }
+
+    public void setFuzzyEnabled(boolean enabled) {
+        mSp.edit().putBoolean(K_FUZZY, enabled).apply();
+    }
+
+    /** 上下文联想：根据上一词预测下一词（本地 bigram，不出设备） */
+    public boolean isContextPredictEnabled() {
+        return mSp.getBoolean(K_CONTEXT, true);
+    }
+
+    public void setContextPredictEnabled(boolean enabled) {
+        mSp.edit().putBoolean(K_CONTEXT, enabled).apply();
     }
 }

@@ -65,6 +65,8 @@ public class SettingsActivity extends AppCompatActivity {
     private SwitchCompat mSwipeSpaceSwitch;
     private SwitchCompat mSwipeDeleteSwitch;
     private SwitchCompat mFloatingSwitch;
+    private SwitchCompat mFuzzySwitch;
+    private SwitchCompat mContextSwitch;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,6 +95,8 @@ public class SettingsActivity extends AppCompatActivity {
         mSwipeSpaceSwitch = findViewById(R.id.sw_swipe_space);
         mSwipeDeleteSwitch = findViewById(R.id.sw_swipe_delete);
         mFloatingSwitch = findViewById(R.id.sw_floating);
+        mFuzzySwitch = findViewById(R.id.sw_fuzzy);
+        mContextSwitch = findViewById(R.id.sw_context);
 
         buildSkinRow();
         buildAccentRow();
@@ -238,6 +242,18 @@ public class SettingsActivity extends AppCompatActivity {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 mPrefs.setFloatingCandidates(isChecked);
+            }
+        });
+        mFuzzySwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                mPrefs.setFuzzyEnabled(isChecked);
+            }
+        });
+        mContextSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                mPrefs.setContextPredictEnabled(isChecked);
             }
         });
         mSkinDark.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -479,6 +495,19 @@ public class SettingsActivity extends AppCompatActivity {
                         Toast.LENGTH_SHORT).show();
             }
         });
+        findViewById(R.id.btn_clear_cooc).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mStore.clearCooc();
+                    }
+                }).start();
+                Toast.makeText(SettingsActivity.this, R.string.toast_done,
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     // ------------------------------------------------------------------
@@ -493,6 +522,8 @@ public class SettingsActivity extends AppCompatActivity {
         mSwipeSpaceSwitch.setChecked(mPrefs.isSwipeSpaceEnabled());
         mSwipeDeleteSwitch.setChecked(mPrefs.isSwipeDeleteEnabled());
         mFloatingSwitch.setChecked(mPrefs.isFloatingCandidates());
+        mFuzzySwitch.setChecked(mPrefs.isFuzzyEnabled());
+        mContextSwitch.setChecked(mPrefs.isContextPredictEnabled());
         mSkinDark.setChecked(mPrefs.isSkinDark());
 
         boolean custom = "custom".equals(mPrefs.getSkinId());

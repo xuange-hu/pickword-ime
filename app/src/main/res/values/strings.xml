@@ -42,6 +42,10 @@
     <string name="pref_group_input">输入</string>
     <string name="pref_gloss_enable">候选旁显示译词</string>
     <string name="pref_gloss_enable_summary">关闭后候选只显示中文</string>
+    <string name="pref_fuzzy">模糊音</string>
+    <string name="pref_fuzzy_summary">z/zh、an/ang 等易混音节互相映射，分不清卷舌/前后鼻音也能打对</string>
+    <string name="pref_context">上下文联想</string>
+    <string name="pref_context_summary">根据上一词预测下一词（如「我们」后更可能出「好」），只学你自己的输入习惯</string>
     <string name="pref_gloss_position">译词位置</string>
     <string name="pref_gloss_position_right">候选右侧</string>
     <string name="pref_gloss_position_top">候选下方</string>
@@ -87,6 +91,8 @@
     <string name="pref_group_data">数据与隐私</string>
     <string name="pref_clear_freq">清除用户词频</string>
     <string name="pref_clear_freq_summary">清空个人常用词排序，保留生词本</string>
+    <string name="pref_clear_cooc">清除上下文联想</string>
+    <string name="pref_clear_cooc_summary">清空「上一词→下一词」的个人习惯，保留生词本与词频</string>
     <string name="pref_privacy">隐私：完全离线，不申请网络权限</string>
     <string name="pref_about">关于拾词输入法</string>
 
