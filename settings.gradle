@@ -6,7 +6,9 @@ pluginManagement {
     }
 }
 dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    // PREFER_SETTINGS：放行全局 init.gradle 注入的项目级仓库（mavenLocal 等），
+    // 仍以 settings 仓库优先，避免与 ~/.gradle/init.gradle 的镜像脚本冲突
+    repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
     repositories {
         google()
         mavenCentral()

@@ -48,6 +48,10 @@ public final class Prefs {
     private static final String K_FUZZY = "fuzzy_pinyin";
     private static final String K_CONTEXT = "context_predict";
 
+    // 学英语（v0.5.0）
+    private static final String K_TTS = "tts_speak";
+    private static final String K_EN_OUTPUT = "en_output";
+
     public static final int THEME_SYSTEM = 0;
     public static final int THEME_LIGHT = 1;
     public static final int THEME_DARK = 2;
@@ -339,5 +343,23 @@ public final class Prefs {
 
     public void setContextPredictEnabled(boolean enabled) {
         mSp.edit().putBoolean(K_CONTEXT, enabled).apply();
+    }
+
+    /** 发音：上屏中文词时朗读其英文释义（学英语，Android TTS 离线） */
+    public boolean isTtsEnabled() {
+        return mSp.getBoolean(K_TTS, true);
+    }
+
+    public void setTtsEnabled(boolean enabled) {
+        mSp.edit().putBoolean(K_TTS, enabled).apply();
+    }
+
+    /** 英文直出：上屏输出英文释义而非中文（打中文出英文） */
+    public boolean isEnOutputEnabled() {
+        return mSp.getBoolean(K_EN_OUTPUT, false);
+    }
+
+    public void setEnOutputEnabled(boolean enabled) {
+        mSp.edit().putBoolean(K_EN_OUTPUT, enabled).apply();
     }
 }

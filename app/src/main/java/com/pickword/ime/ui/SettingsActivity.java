@@ -67,6 +67,8 @@ public class SettingsActivity extends AppCompatActivity {
     private SwitchCompat mFloatingSwitch;
     private SwitchCompat mFuzzySwitch;
     private SwitchCompat mContextSwitch;
+    private SwitchCompat mTtsSwitch;
+    private SwitchCompat mEnOutputSwitch;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,6 +99,8 @@ public class SettingsActivity extends AppCompatActivity {
         mFloatingSwitch = findViewById(R.id.sw_floating);
         mFuzzySwitch = findViewById(R.id.sw_fuzzy);
         mContextSwitch = findViewById(R.id.sw_context);
+        mTtsSwitch = findViewById(R.id.sw_tts);
+        mEnOutputSwitch = findViewById(R.id.sw_en_output);
 
         buildSkinRow();
         buildAccentRow();
@@ -254,6 +258,18 @@ public class SettingsActivity extends AppCompatActivity {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 mPrefs.setContextPredictEnabled(isChecked);
+            }
+        });
+        mTtsSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                mPrefs.setTtsEnabled(isChecked);
+            }
+        });
+        mEnOutputSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                mPrefs.setEnOutputEnabled(isChecked);
             }
         });
         mSkinDark.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -524,6 +540,8 @@ public class SettingsActivity extends AppCompatActivity {
         mFloatingSwitch.setChecked(mPrefs.isFloatingCandidates());
         mFuzzySwitch.setChecked(mPrefs.isFuzzyEnabled());
         mContextSwitch.setChecked(mPrefs.isContextPredictEnabled());
+        mTtsSwitch.setChecked(mPrefs.isTtsEnabled());
+        mEnOutputSwitch.setChecked(mPrefs.isEnOutputEnabled());
         mSkinDark.setChecked(mPrefs.isSkinDark());
 
         boolean custom = "custom".equals(mPrefs.getSkinId());

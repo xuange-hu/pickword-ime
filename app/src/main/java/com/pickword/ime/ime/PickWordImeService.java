@@ -11,6 +11,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
+import android.speech.tts.TextToSpeech;
 import android.text.InputType;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -145,6 +146,8 @@ public class PickWordImeService extends InputMethodService {
 
     /** 上下文联想：上一词已上屏的中文词（用于本地 bigram 预测，仿搜狗/百度） */
     private String mLastWord = null;
+    private TextToSpeech mTts;
+    private boolean mTtsReady = false;
 
     private final Handler mMainHandler = new Handler(Looper.getMainLooper());
     private final ExecutorService mWorker = Executors.newSingleThreadExecutor();
@@ -161,6 +164,21 @@ public class PickWordImeService extends InputMethodService {
         mStore = Store.get(this);
         mEngine = new PinyinEngine(mStore);
         mSwipeSlop = 24 * getResources().getDisplayMetrics().density;
+        // 发音引擎（Android TTS，离线）：上屏中文词时朗读英文释义，学英语用
+        try {
+            mTts = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
+                @Override
+                public void onInit(int status) {
+                    if (status == TextToSpeech.SUCCESS) {
+                        int r = mTts.setLanguage(java.util.Locale.US);
+                        mTtsReady = (r != TextToSpeech.LANG_MISSING_DATA
+                                && r != TextToSpeech.LANG_NOT_SUPPORTED);
+                    }
+                }
+            });
+        } catch (Throwable ignored) {
+            // 无 TTS 引擎时静默跳过，不影响输入
+        }
         // 词库解压与建库放到后台，避免拖慢键盘首次弹出
         mWorker.execute(new Runnable() {
             @Override
@@ -183,6 +201,14 @@ public class PickWordImeService extends InputMethodService {
 
     @Override
     public void onDestroy() {
+        if (mTts != null) {
+            try {
+                mTts.stop();
+                mTts.shutdown();
+            } catch (Throwable ignored) {
+            }
+            mTts = null;
+        }
         mWorker.shutdownNow();
         super.onDestroy();
     }
@@ -1017,13 +1043,27 @@ public class PickWordImeService extends InputMethodService {
     }
 
     private void commitCandidate(final Candidate candidate) {
+        final String word = candidate.word;
+        // 取英文释义（供发音 / 英文直出），失败或为空则退回中文词
+        String english = null;
+        if (mPrefs.isEnOutputEnabled() || mPrefs.isTtsEnabled()) {
+            english = extractEnglish(candidate.gloss);
+        }
+        String out = word;
+        if (mPrefs.isEnOutputEnabled() && english != null && english.length() > 0) {
+            out = english; // 英文直出：打中文上屏英文，学英语/写英文用
+        }
         InputConnection ic = getCurrentInputConnection();
         if (ic != null) {
-            ic.finishComposingText();
-            ic.commitText(candidate.word, 1);
+            // commitText 会替换当前组合中的拼音（勿先 finishComposingText，
+            // 否则拼音会被当正文提交，出现「hao好」漏字）
+            ic.commitText(out, 1);
         }
-        recordClip(candidate.word);
-        final String word = candidate.word;
+        recordClip(out);
+        // 发音：上屏中文词时朗读英文释义（Android TTS，离线）
+        if (mPrefs.isTtsEnabled() && containsCJK(word)) {
+            speakEnglish(english);
+        }
         // 先在主线程捕获「上一词」：若在后台任务里再读 mLastWord，
         // 主线程可能已把它更新为当前词，导致 prev==word 被跳过、共现永远记不上
         final String prevWord = mLastWord;
@@ -1045,6 +1085,68 @@ public class PickWordImeService extends InputMethodService {
             mLastWord = null;
         }
         clearComposing(true);
+    }
+
+    /** 朗读英文释义（Android TTS，离线；无引擎时静默） */
+    private void speakEnglish(String en) {
+        if (mTts == null || !mTtsReady || en == null || en.length() == 0) {
+            return;
+        }
+        try {
+            mTts.speak(en, TextToSpeech.QUEUE_FLUSH, null, "pickword");
+        } catch (Throwable ignored) {
+        }
+    }
+
+    /**
+     * 从英文释义提取最简短的英文短语（供发音 / 英文直出）。
+     * 释义形如「one; single」「(used after a verb) give it a go; to do…」：
+     * 取首段 → 去开头括注 (...) / [...] → 截断到首个非 ASCII（去掉中文/音标/省略号）。
+     */
+    private static String extractEnglish(String gloss) {
+        if (gloss == null) {
+            return "";
+        }
+        String s = gloss;
+        int sc = s.indexOf(';');
+        if (sc > 0) {
+            s = s.substring(0, sc);
+        }
+        s = s.trim();
+        // 去掉开头的括注 (...) / [...]
+        while (s.length() > 0 && (s.charAt(0) == '(' || s.charAt(0) == '[')) {
+            char open = s.charAt(0);
+            char close = (open == '(') ? ')' : ']';
+            int depth = 0, end = -1;
+            for (int i = 0; i < s.length(); i++) {
+                char c = s.charAt(i);
+                if (c == open) {
+                    depth++;
+                } else if (c == close) {
+                    depth--;
+                    if (depth == 0) {
+                        end = i;
+                        break;
+                    }
+                }
+            }
+            if (end >= 0) {
+                s = s.substring(end + 1).trim();
+            } else {
+                break;
+            }
+        }
+        // 截断到第一个非 ASCII 可打印字符（去掉中文、音标、破折号、省略号）
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (c >= 0x20 && c < 0x7F) {
+                sb.append(c);
+            } else {
+                break;
+            }
+        }
+        return sb.toString().trim();
     }
 
     private void commitText(String text) {

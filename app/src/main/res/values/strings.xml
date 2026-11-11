@@ -46,6 +46,10 @@
     <string name="pref_fuzzy_summary">z/zh、an/ang 等易混音节互相映射，分不清卷舌/前后鼻音也能打对</string>
     <string name="pref_context">上下文联想</string>
     <string name="pref_context_summary">根据上一词预测下一词（如「我们」后更可能出「好」），只学你自己的输入习惯</string>
+    <string name="pref_tts">上屏发音</string>
+    <string name="pref_tts_summary">打出中文词时朗读它的英文释义，边打字边听英语（用系统 TTS，离线可用）</string>
+    <string name="pref_en_output">英文直出</string>
+    <string name="pref_en_output_summary">上屏英文释义而非中文（打「好」出 good），写英文或自测单词用；发音不受影响</string>
     <string name="pref_gloss_position">译词位置</string>
     <string name="pref_gloss_position_right">候选右侧</string>
     <string name="pref_gloss_position_top">候选下方</string>
